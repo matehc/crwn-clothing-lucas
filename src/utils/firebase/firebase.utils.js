@@ -1,80 +1,76 @@
-import { initializeApp } from 'firebase/app';
-import { 
-    getAuth, 
-    signInWithRedirect, 
-    signInWithPopup, 
-    GoogleAuthProvider 
-} from 'firebase/auth'
-
+import { initializeApp } from "firebase/app";
 import {
-    getFirestore, 
-    doc,
-    getDoc,
-    setDoc
-} from 'firebase/firestore'
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
+} from "firebase/auth";
+
+import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
 
 // Firebase configuration
 const firebaseConfig = {
+  apiKey: "AIzaSyCpQcpW55RWuKhHbo3b6E6kbsyDrFQhBmk",
 
-    apiKey: "AIzaSyCpQcpW55RWuKhHbo3b6E6kbsyDrFQhBmk",
-  
-    authDomain: "crwn-clothing-db-ece0f.firebaseapp.com",
-  
-    projectId: "crwn-clothing-db-ece0f",
-  
-    storageBucket: "crwn-clothing-db-ece0f.appspot.com",
-  
-    messagingSenderId: "517639897810",
-  
-    appId: "1:517639897810:web:36d6876c9b86b8677ca30b"
-  
-  };
-  
-  
-  // Initialize Firebase
+  authDomain: "crwn-clothing-db-ece0f.firebaseapp.com",
 
-  const firebaseApp = initializeApp(firebaseConfig);
+  projectId: "crwn-clothing-db-ece0f",
 
-  const provider = new GoogleAuthProvider();
+  storageBucket: "crwn-clothing-db-ece0f.appspot.com",
 
-  provider.setCustomParameters({ prompt: 'select_account'}); 
+  messagingSenderId: "517639897810",
 
-  export const auth = getAuth(firebaseApp)
-  export const signInWithGooglePopup = () => signInWithPopup(auth, provider);
+  appId: "1:517639897810:web:36d6876c9b86b8677ca30b",
+};
 
-  // This will point to our database inside firestore
-  export const db = getFirestore();
+// Initialize Firebase
 
-  // take in user authentication response from google and pass it in to create or retrieve collection
-  export const createUserDocumentFromAuth = async (userAuth) => {
-    console.log(userAuth)
+const firebaseApp = initializeApp(firebaseConfig);
 
-    // this will retrieve the 'users' document reference;
-    const userDocRef = doc(db, 'users', userAuth.uid);
-    console.log(userDocRef);
+const provider = new GoogleAuthProvider();
 
+provider.setCustomParameters({ prompt: "select_account" });
 
+export const auth = getAuth(firebaseApp);
+export const signInWithGooglePopup = () => signInWithPopup(auth, provider);
 
-    // use the document reference to actually retrieve the data
-    const userSnapshot = await getDoc(userDocRef);
-    console.log(userSnapshot.exists());
+// This will point to our database inside firestore
+export const db = getFirestore();
 
-    // check if document reference exists
-    // if it doesn't, create document.
-    if(!userSnapshot.exists()) {
-       const { displayName, email } = userAuth;
-       const createdAt = new Date();
+// take in user authentication response from google and pass it in to create or retrieve collection
+export const createUserDocumentFromAuth = async (userAuth) => {
+  if (!userAuth) return;
 
-       try {
-        await setDoc(userDocRef, {
-            displayName,
-            email,
-            createdAt
-        });
-       } catch (error) {
-        console.log('error creating the user', error);
-       }
+  // this will retrieve the 'users' document reference;
+  const userDocRef = doc(db, "users", userAuth.uid);
+  console.log(userDocRef);
+
+  // use the document reference to actually retrieve the data
+  const userSnapshot = await getDoc(userDocRef);
+  console.log(userSnapshot.exists());
+
+  // check if document reference exists
+  // if it doesn't, create document.
+  if (!userSnapshot.exists()) {
+    const { displayName, email } = userAuth;
+    const createdAt = new Date();
+
+    try {
+      await setDoc(userDocRef, {
+        displayName,
+        email,
+        createdAt,
+      });
+    } catch (error) {
+      console.log("error creating the user", error);
     }
-
-    return userDocRef;
   }
+
+  return userDocRef;
+};
+
+export const createAuthUserWithEmailAndPassword = async (email, password) => {
+  if (!email || !password) return;
+
+  return await createUserWithEmailAndPassword(auth, email, password);
+};
