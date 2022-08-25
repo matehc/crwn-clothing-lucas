@@ -77,14 +77,15 @@ export const createAuthUserWithEmailAndPassword = async (email, password) => {
 };
 
 export const signInAuthUserWithEmailAndPassword = async (email, password) => {
-    if (!email || !password) return;
-  
-    return await signInWithEmailAndPassword(auth, email, password);
-  };
+  if (!email || !password) return;
 
-  // this signs out a user by using the auth
-  export const signOutUser = async () => await signOut(auth);
+  return await signInWithEmailAndPassword(auth, email, password);
+};
 
-  // the onAuthStateChanged listener actively listens for any change in the state of our auth,
-  // if auth changes fire the callback
-  export const onAuthStateChangedListener = (callback) => onAuthStateChanged(auth, callback)
+// this signs out a user by using the auth
+export const signOutUser = async () => await signOut(auth);
+
+// the onAuthStateChanged listener actively listens for any change in the state of our auth,
+// if auth changes fire the callback
+export const onAuthStateChangedListener = (callback) =>
+  onAuthStateChanged(auth, callback);
