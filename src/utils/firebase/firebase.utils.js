@@ -5,6 +5,8 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
+  signOut,
+  onAuthStateChanged,
 } from "firebase/auth";
 
 import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
@@ -44,11 +46,9 @@ export const createUserDocumentFromAuth = async (userAuth) => {
 
   // this will retrieve the 'users' document reference;
   const userDocRef = doc(db, "users", userAuth.uid);
-  console.log(userDocRef);
 
   // use the document reference to actually retrieve the data
   const userSnapshot = await getDoc(userDocRef);
-  console.log(userSnapshot.exists());
 
   // check if document reference exists
   // if it doesn't, create document.
@@ -81,3 +81,10 @@ export const signInAuthUserWithEmailAndPassword = async (email, password) => {
   
     return await signInWithEmailAndPassword(auth, email, password);
   };
+
+  // this signs out a user by using the auth
+  export const signOutUser = async () => await signOut(auth);
+
+  // the onAuthStateChanged listener actively listens for any change in the state of our auth,
+  // if auth changes fire the callback
+  export const onAuthStateChangedListener = (callback) => onAuthStateChanged(auth, callback)
